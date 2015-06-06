@@ -1,5 +1,6 @@
 package main
 
+// Create Dockerfile
 // TODO: Change hardcoded auth URLs in login.html
 
 import (
@@ -35,11 +36,7 @@ func main() {
 	var addr = flag.String("addr", ":8080", "The addr of the application")
 	flag.Parse()
 	r := newRoom()
-	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
-	http.Handle("/login", &templateHandler{filename: "login.html"})
-	http.HandleFunc("/logout", logoutHandler)
-	// TODO: Remove
-	http.HandleFunc("/auth/", loginHandler)
+	http.Handle("/chat", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 	http.Handle(
 		"/bower_components/",

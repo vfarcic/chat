@@ -3,27 +3,24 @@ package main
 import (
 	"github.com/gorilla/websocket"
 	"time"
-	"log"
 )
 
 type client struct {
 	socket *websocket.Conn
 	send chan *message
 	room *room
-	userData map[string]interface {}
+	name string
+	avatarlURL string
 }
 
 func (c *client) read() {
 	for {
 		var msg *message
-		log.Println(c.userData)
 		if err := c.socket.ReadJSON(&msg); err == nil {
 			msg.Date = time.Now().Format("Monday, 02-Jan-06")
 			msg.Time = time.Now().Format("15:04")
-			msg.Name = c.userData["name"].(string)
-			if avatarURL, ok := c.userData["avatarURL"]; ok {
-				msg.AvatarURL = avatarURL.(string)
-			}
+			msg.Name = c.name
+			msg.AvatarURL = c.avatarlURL
 			c.room.forward <- msg
 		} else {
 			break;

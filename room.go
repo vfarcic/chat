@@ -4,7 +4,6 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"log"
-	"github.com/stretchr/objx"
 )
 
 type room struct {
@@ -62,15 +61,22 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("ServeHTTP:", err)
 		return
 	}
-	authCookie, err := req.Cookie("auth")
-	if err != nil {
-		log.Fatal("Failed to get auth cookie:", err)
+	authNameCookie, err := req.Cookie("authName")
+	var authName = "John Doe"
+	if err == nil {
+		authName = authNameCookie.Value
+	}
+	authAvatarURLCookie, err := req.Cookie("authAvatarURL")
+	authAvatarURL := ""
+	if err == nil {
+		authAvatarURL = authAvatarURLCookie.Value
 	}
 	client := &client {
 		socket: socket,
 		send: make(chan *message, messageBufferSize),
 		room: r,
-		userData: objx.MustFromBase64(authCookie.Value),
+		name: authName,
+		avatarlURL: authAvatarURL,
 	}
 	r.join <- client
 	defer func() { r.leave <- client }()
