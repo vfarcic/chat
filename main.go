@@ -45,10 +45,10 @@ func main() {
 		"/components/",
 		http.StripPrefix("/components/", http.FileServer(http.Dir("components"))))
 	go r.run()
-	log.Println("Starting the server on", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
+	log.Println("Starting the server on", *addr)
 
 }
 

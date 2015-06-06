@@ -15,4 +15,4 @@ bower install
 go build -o chat && ./chat -addr ":8081"
 ```
 
-Make sure that authName (mandatory) and authAvatarURL (optional) are created before user enter a room.
+Make sure that authName (mandatory) and authAvatarURL (optional) are created before user enters a room.
