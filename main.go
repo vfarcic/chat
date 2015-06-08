@@ -1,7 +1,6 @@
 package main
 
-// Create Dockerfile
-// TODO: Change hardcoded auth URLs in login.html
+// Use LocalStorage
 
 import (
 	"log"
@@ -11,6 +10,7 @@ import (
 	"sync"
 	"flag"
 	"github.com/stretchr/objx"
+	phttp "github.com/pikanezi/http"
 )
 
 type templateHandler struct {
@@ -33,19 +33,21 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var addr = flag.String("addr", ":8080", "The addr of the application")
+	var addr = flag.String("addr", ":8080", "The address of the application. Default value is ':8080'")
 	flag.Parse()
-	r := newRoom()
-	http.Handle("/chat", &templateHandler{filename: "chat.html"})
-	http.Handle("/room", r)
-	http.Handle(
-		"/bower_components/",
+	r := phttp.NewRouter()
+	r.SetCustomHeader(phttp.Header{
+		"Access-Control-Allow-Origin": "*",
+	})
+	room := newRoom()
+	r.Handle("/test", &templateHandler{filename: "test.html"})
+	r.Handle("/room", room)
+	r.PathPrefix("/bower_components/").Handler(
 		http.StripPrefix("/bower_components/", http.FileServer(http.Dir("bower_components"))))
-	http.Handle(
-		"/components/",
+	r.PathPrefix("/components/").Handler(
 		http.StripPrefix("/components/", http.FileServer(http.Dir("components"))))
-	go r.run()
-	if err := http.ListenAndServe(*addr, nil); err != nil {
+	go room.run()
+	if err := http.ListenAndServe(*addr, r); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 	log.Println("Starting the server on", *addr)
