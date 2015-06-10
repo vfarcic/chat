@@ -1,0 +1,75 @@
+<dom-module id="display-chat">
+    <style is="custom-style">
+        :host {
+            display: block;
+        }
+
+        .list {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #dedede;
+        }
+
+        .list paper-item-body div {
+            white-space: normal;
+            padding-left: 5px;
+        }
+
+        .avatar {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #ccc;
+        }
+    </style>
+    <template>
+        <template is="dom-repeat" items="{{messages}}">
+            <template is="dom-if" if="{{item.displayDate}}" style="margin-bottom: 20px;">
+                <div class="list">
+                    <h3>{{item.Date}}</h3>
+                </div>
+            </template>
+            <div class="list">
+                <paper-item>
+                    <iron-icon class="avatar" src="{{item.AvatarURL}}"></iron-icon>
+                    <paper-item-body>
+                        <div>{{item.Name}}</div>
+                        <div secondary>{{item.Message}}</div>
+                    </paper-item-body>
+                    <iron-item>{{item.Time}}</iron-item>
+                </paper-item>
+            </div>
+        </template>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: "display-chat",
+        ready: function() {
+            var p = this;
+            // TODO: Load from DB
+            this.messages = [];
+            var socket = null;
+            if (window["WebSocket"]) {
+                // TODO: Change to param
+                socket = new WebSocket("ws://localhost:8080/room");
+                socket.onmessage = function(e) {
+                    var msg = eval("(" + e.data + ")");
+                    var messagesSize = p.messages.length;
+                    var displayDate = true;
+                    if (messagesSize > 0) {
+                        var prevMessage = p.messages[messagesSize - 1];
+                        if (prevMessage.Date === msg.Date) {
+                            displayDate = false;
+                        }
+                    }
+//                    console.log(msg);
+                    msg.displayDate = displayDate;
+                    p.push('messages', msg);
+                };
+            }
+        }
+    });
+</script>

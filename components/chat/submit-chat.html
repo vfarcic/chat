@@ -1,0 +1,33 @@
+<dom-module id="submit-chat">
+    <template>
+        <paper-textarea id="message" on-keypress="keyPressHandler" label="Write your message"></paper-textarea>
+        <!--TODO: Hide-->
+        <paper-fab id="submit" on-tap="submitChat" icon="arrow-forward" mini hidden></paper-fab>
+    </template>
+</dom-module>
+<script>
+    var socket = null;
+    Polymer({
+        is: "submit-chat",
+        properties: {
+            backendHost: {
+                type: String,
+                value: "http://localhost:8080"
+            }
+        },
+        ready: function() {
+            socket = new WebSocket("ws://localhost:8080/room");
+        },
+        submitChat: function() {
+            if (this.$.message.value.trim() !== '') {
+                socket.send(JSON.stringify({"message": this.$.message.value}));
+            }
+            this.$.message.value = '';
+        },
+        keyPressHandler: function(event) {
+            if (event.charCode == 13) {
+                this.$.submit.click();
+            }
+        }
+    });
+</script>

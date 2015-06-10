@@ -1,4 +1,4 @@
-.idea
-*.iml
-bower_components
-chat
+/.idea
+/*.iml
+/bower_components
+/chat
