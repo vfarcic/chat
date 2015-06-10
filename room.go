@@ -26,18 +26,35 @@ func (r *room) run() {
 	for {
 		select {
 		case client := <-r.join:
+			if !r.clients[client] {
+				for clientToSend := range r.clients {
+					msg := &message{
+						Name: client.name,
+						Type: MessageTypeJoin,
+					}
+					clientToSend.send <-msg
+				}
+				log.Println(client.name, "joined")
+			}
 			r.clients[client] = true
-			log.Println("New client joined")
 		case client := <-r.leave:
+			if r.clients[client] {
+				for clientToSend := range r.clients {
+					msg := &message{
+						Name: client.name,
+						Type: MessageTypeLeave,
+					}
+					clientToSend.send <-msg
+				}
+				log.Println(client.name, "left")
+			}
 			delete(r.clients, client)
 			close(client.send)
-			log.Println("Client left")
 		case msg := <-r.forward:
-			log.Println("Messsage received: ", msg.Message)
+			log.Println("Messsage received from", msg.Name, ":\n", msg.Message)
 			for client := range r.clients {
 				select {
 				case client.send <-msg:
-					log.Println(" -- sent to client")
 					// Send the message
 				default:
 					delete(r.clients, client)

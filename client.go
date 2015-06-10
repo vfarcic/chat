@@ -21,6 +21,7 @@ func (c *client) read() {
 			msg.Time = time.Now().Format("15:04")
 			msg.Name = c.name
 			msg.AvatarURL = c.avatarlURL
+			msg.Type = MessageTypeMessage
 			c.room.forward <- msg
 		} else {
 			break;

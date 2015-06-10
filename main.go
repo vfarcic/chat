@@ -1,6 +1,7 @@
 package main
 
-// Use LocalStorage
+// TODO: Use LocalStorage
+// TODO: Store/retrieve from MongoDB
 
 import (
 	"log"

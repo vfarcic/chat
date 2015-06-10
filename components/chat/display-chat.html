@@ -1,4 +1,6 @@
 <dom-module id="display-chat">
+    <!--TODO: Display only last message-->
+    <!--TODO: Create show all message button-->
     <style is="custom-style">
         :host {
             display: block;
@@ -51,12 +53,12 @@
             var p = this;
             // TODO: Load from DB
             this.messages = [];
-            var socket = null;
-            if (window["WebSocket"]) {
-                // TODO: Change to param
-                socket = new WebSocket("ws://localhost:8080/room");
-                socket.onmessage = function(e) {
-                    var msg = eval("(" + e.data + ")");
+            // TODO: Change to param
+            var socket = new WebSocket("ws://localhost:8080/room");
+            socket.onmessage = function(e) {
+                var msg = eval("(" + e.data + ")");
+                console.log(msg);
+                if (msg.Type === "message") {
                     var messagesSize = p.messages.length;
                     var displayDate = true;
                     if (messagesSize > 0) {
@@ -65,11 +67,10 @@
                             displayDate = false;
                         }
                     }
-//                    console.log(msg);
                     msg.displayDate = displayDate;
                     p.push('messages', msg);
-                };
-            }
+                }
+            };
         }
     });
 </script>

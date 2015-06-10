@@ -25,7 +25,7 @@
             this.$.message.value = '';
         },
         keyPressHandler: function(event) {
-            if (event.charCode == 13) {
+            if (event.charCode == 13 || event.charCode == 0) {
                 this.$.submit.click();
             }
         }

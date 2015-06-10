@@ -1,0 +1,78 @@
+<dom-module id="display-users">
+    <!--<style is="custom-style">-->
+        <!--:host {-->
+            <!--display: block;-->
+        <!--}-->
+
+        <!--.list {-->
+            <!--padding-top: 5px;-->
+            <!--padding-bottom: 5px;-->
+            <!--border-bottom: 1px solid #dedede;-->
+        <!--}-->
+
+        <!--.list paper-item-body div {-->
+            <!--white-space: normal;-->
+            <!--padding-left: 5px;-->
+        <!--}-->
+
+        <!--.avatar {-->
+            <!--display: inline-block;-->
+            <!--width: 60px;-->
+            <!--height: 60px;-->
+            <!--border-radius: 50%;-->
+            <!--overflow: hidden;-->
+            <!--background: #ccc;-->
+        <!--}-->
+    <!--</style>-->
+    <template>
+        xxx
+        <template is="dom-repeat" items="{{users}}">
+            <div class="list">
+                <paper-item>
+                    <iron-item>{{item.name}}</iron-item>
+                </paper-item>
+            </div>
+        </template>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: "display-users",
+        ready: function() {
+            var p = this;
+            // TODO: Load from DB
+            this.users = [];
+            // TODO: Figure out how to share the socket between components
+            // TODO: Change to param
+            var socket = new WebSocket("ws://localhost:8080/room");
+            socket.onmessage = function(e) {
+                var msg = eval("(" + e.data + ")");
+                if (msg.Type === "join") {
+                    var found = false;
+                    var usersLength = p.users.length
+                    for(var i = 0; i < usersLength; i++) {
+                        if (p.users[i].name === msg.Name) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        var user = {name: msg.Name};
+                        p.push('users', user);
+                    }
+                } else if (msg.Type === "join") {
+                    var found = false;
+                    var usersLength = p.users.length
+                    for(var i = 0; i < usersLength; i++) {
+                        if (p.users[i].name === msg.Name) {
+                            found = true;
+                        }
+                    }
+                    if (found) {
+                        var user = {name: msg.Name};
+                        p.pop('users', user);
+                    }
+                }
+            };
+        }
+    });
+</script>
