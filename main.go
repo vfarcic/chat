@@ -1,8 +1,5 @@
 package main
 
-// TODO: Use LocalStorage
-// TODO: Store/retrieve from MongoDB
-
 import (
 	"log"
 	"net/http"

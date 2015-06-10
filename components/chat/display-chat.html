@@ -51,13 +51,13 @@
         is: "display-chat",
         ready: function() {
             var p = this;
+            // TODO: Use LocalStorage
             // TODO: Load from DB
             this.messages = [];
             // TODO: Change to param
             var socket = new WebSocket("ws://localhost:8080/room");
             socket.onmessage = function(e) {
                 var msg = eval("(" + e.data + ")");
-                console.log(msg);
                 if (msg.Type === "message") {
                     var messagesSize = p.messages.length;
                     var displayDate = true;
