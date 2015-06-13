@@ -11,7 +11,7 @@ type MongoDB struct {
 type DB interface {
 	Save(msg Message) error
 	Drop() error
-	GetAll() error
+	GetAll() ([]Message, error)
 }
 
 func (db MongoDB) Save(msg Message) error {

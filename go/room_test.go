@@ -6,10 +6,10 @@ import (
 )
 
 func TestJoinAddsClientToTheList(t *testing.T) {
-	testClients := make(map[*Client]bool)
+	room := newRoom()
 	testClient := getTestClient("John Doe")
-	joinRoom(testClient, testClients)
-	assert.Len(t, testClients, 1)
+	room.joinRoom(testClient)
+	assert.Len(t, room.clients, 1)
 }
 
 //func TestJoinShouldSendJoinMessageToAllClients(t *testing.T) {

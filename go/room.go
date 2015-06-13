@@ -6,15 +6,15 @@ import (
 	"log"
 )
 
-type room struct {
+type Room struct {
 	forward chan *Message
 	join chan *Client
 	leave chan *Client
 	clients map[*Client]bool
 }
 
-func newRoom() *room {
-	return &room {
+func newRoom() *Room {
+	return &Room{
 		forward: make(chan *Message),
 		join: make(chan *Client),
 		leave: make(chan *Client),
@@ -22,22 +22,22 @@ func newRoom() *room {
 	}
 }
 
-func (r *room) Run() {
+func (r *Room) Run() {
 	for {
 		select {
 		case client := <-r.join:
-			joinRoom(client, r.clients)
+			r.joinRoom(client)
 		case client := <-r.leave:
-			leaveRoom(client, r.clients)
+			r.leaveRoom(client)
 		case msg := <-r.forward:
-			sendMessage(msg, r.clients, MongoDB{})
+			r.sendMessage(msg, MongoDB{})
 		}
 	}
 }
 
-func joinRoom(joinClient *Client, clients map[*Client]bool) {
-	if !clients[joinClient] {
-		for clientToSend := range clients {
+func (r *Room) joinRoom(joinClient *Client) {
+	if !r.clients[joinClient] {
+		for clientToSend := range r.clients {
 			msgNewClient := &Message{
 				Name: joinClient.name,
 				Type: MessageTypeJoin,
@@ -51,12 +51,14 @@ func joinRoom(joinClient *Client, clients map[*Client]bool) {
 		}
 		log.Println(joinClient.name, "joined")
 	}
-	clients[joinClient] = true
+	r.clients[joinClient] = true
+//	messages := db
+//	clientToSend.send <- msg
 }
 
-func leaveRoom(leaveClient *Client, clients map[*Client]bool) {
-	if clients[leaveClient] {
-		for clientToSend := range clients {
+func (r *Room) leaveRoom(leaveClient *Client) {
+	if r.clients[leaveClient] {
+		for clientToSend := range r.clients {
 			msg := &Message{
 				Name: leaveClient.name,
 				Type: MessageTypeLeave,
@@ -65,23 +67,23 @@ func leaveRoom(leaveClient *Client, clients map[*Client]bool) {
 		}
 		log.Println(leaveClient.name, "left")
 	}
-	delete(clients, leaveClient)
+	delete(r.clients, leaveClient)
 	close(leaveClient.send)
 }
 
-func sendMessage(msg Message, clients map[*Client]bool, db DB) error {
+func (r *Room) sendMessage(msg *Message, db DB) error {
 	log.Println("Messsage received from", msg.Name, ":\n", msg.Message)
-	for clientToSend := range clients {
+	for clientToSend := range r.clients {
 		select {
 		case clientToSend.send <- msg:
 		// Send the message
 		default:
-			delete(clients, clientToSend)
+			delete(r.clients, clientToSend)
 			close(clientToSend.send)
 			log.Println(" -- failed to send")
 		}
 	}
-	err := db.Save(msg)
+	err := db.Save(*msg)
 	return err
 }
 
@@ -95,7 +97,7 @@ var upgrader = &websocket.Upgrader{
 	WriteBufferSize: socketBufferSize,
 }
 
-func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (r *Room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	socket, err := upgrader.Upgrade(w, req, nil)
 	if err != nil {
 		log.Fatal("ServeHTTP:", err)
