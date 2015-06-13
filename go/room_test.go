@@ -6,7 +6,7 @@ import (
 )
 
 func TestJoinAddsClientToTheList(t *testing.T) {
-	testClients := make(map[*client]bool)
+	testClients := make(map[*Client]bool)
 	testClient := getTestClient("John Doe")
 	joinRoom(testClient, testClients)
 	assert.Len(t, testClients, 1)
@@ -30,8 +30,8 @@ func TestJoinAddsClientToTheList(t *testing.T) {
 
 // Helper
 
-func getTestClient(name string) *client {
-	return &client{
+func getTestClient(name string) *Client {
+	return &Client{
 		socket: nil,
 		send: make(chan *Message),
 		room: nil,

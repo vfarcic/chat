@@ -8,17 +8,17 @@ import (
 
 type room struct {
 	forward chan *Message
-	join chan *client
-	leave chan *client
-	clients map[*client]bool
+	join chan *Client
+	leave chan *Client
+	clients map[*Client]bool
 }
 
 func newRoom() *room {
 	return &room {
 		forward: make(chan *Message),
-		join: make(chan *client),
-		leave: make(chan *client),
-		clients: make(map[*client]bool),
+		join: make(chan *Client),
+		leave: make(chan *Client),
+		clients: make(map[*Client]bool),
 	}
 }
 
@@ -28,35 +28,14 @@ func (r *room) Run() {
 		case client := <-r.join:
 			joinRoom(client, r.clients)
 		case client := <-r.leave:
-			if r.clients[client] {
-				for clientToSend := range r.clients {
-					msg := &Message{
-						Name: client.name,
-						Type: MessageTypeLeave,
-					}
-					clientToSend.send <-msg
-				}
-				log.Println(client.name, "left")
-			}
-			delete(r.clients, client)
-			close(client.send)
+			leaveRoom(client, r.clients)
 		case msg := <-r.forward:
-			log.Println("Messsage received from", msg.Name, ":\n", msg.Message)
-			for client := range r.clients {
-				select {
-				case client.send <-msg:
-					// Send the message
-				default:
-					delete(r.clients, client)
-					close(client.send)
-					log.Println(" -- failed to send")
-				}
-			}
+			sendMessage(msg, r.clients, MongoDB{})
 		}
 	}
 }
 
-func joinRoom(joinClient *client, clients map[*client]bool) {
+func joinRoom(joinClient *Client, clients map[*Client]bool) {
 	if !clients[joinClient] {
 		for clientToSend := range clients {
 			msgNewClient := &Message{
@@ -73,6 +52,37 @@ func joinRoom(joinClient *client, clients map[*client]bool) {
 		log.Println(joinClient.name, "joined")
 	}
 	clients[joinClient] = true
+}
+
+func leaveRoom(leaveClient *Client, clients map[*Client]bool) {
+	if clients[leaveClient] {
+		for clientToSend := range clients {
+			msg := &Message{
+				Name: leaveClient.name,
+				Type: MessageTypeLeave,
+			}
+			clientToSend.send <-msg
+		}
+		log.Println(leaveClient.name, "left")
+	}
+	delete(clients, leaveClient)
+	close(leaveClient.send)
+}
+
+func sendMessage(msg Message, clients map[*Client]bool, db DB) error {
+	log.Println("Messsage received from", msg.Name, ":\n", msg.Message)
+	for clientToSend := range clients {
+		select {
+		case clientToSend.send <- msg:
+		// Send the message
+		default:
+			delete(clients, clientToSend)
+			close(clientToSend.send)
+			log.Println(" -- failed to send")
+		}
+	}
+	err := db.Save(msg)
+	return err
 }
 
 const (
@@ -101,7 +111,7 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if err == nil {
 		authAvatarURL = authAvatarURLCookie.Value
 	}
-	client := &client {
+	client := &Client{
 		socket: socket,
 		send: make(chan *Message, messageBufferSize),
 		room: r,

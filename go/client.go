@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type client struct {
+type Client struct {
 	socket *websocket.Conn
 	send chan *Message
 	room *room
@@ -13,7 +13,7 @@ type client struct {
 	avatarlURL string
 }
 
-func (c *client) read() {
+func (c *Client) read() {
 	for {
 		var msg *Message
 		if err := c.socket.ReadJSON(&msg); err == nil {
@@ -30,7 +30,7 @@ func (c *client) read() {
 	c.socket.Close()
 }
 
-func (c *client) write() {
+func (c *Client) write() {
 	for msg := range c.send {
 		if err := c.socket.WriteJSON(msg); err != nil {
 			break;
