@@ -16,7 +16,7 @@ sudo docker run --rm \
 	-v $GOPATH:/go \
 	-w /usr/src/chat \
 	golang:1.4 \
-	go get -d -v && go build -v
+	go get -d -v && go build -v -o chat go/*.go
 ```
 
 Build Docker Container

@@ -22,21 +22,11 @@ func newRoom() *room {
 	}
 }
 
-func (r *room) run() {
+func (r *room) Run() {
 	for {
 		select {
 		case client := <-r.join:
-			if !r.clients[client] {
-				for clientToSend := range r.clients {
-					msg := &message{
-						Name: client.name,
-						Type: MessageTypeJoin,
-					}
-					clientToSend.send <-msg
-				}
-				log.Println(client.name, "joined")
-			}
-			r.clients[client] = true
+			joinRoom(client, r.clients)
 		case client := <-r.leave:
 			if r.clients[client] {
 				for clientToSend := range r.clients {
@@ -64,6 +54,25 @@ func (r *room) run() {
 			}
 		}
 	}
+}
+
+func joinRoom(joinClient *client, clients map[*client]bool) {
+	if !clients[joinClient] {
+		for clientToSend := range clients {
+			msgNewClient := &message{
+				Name: joinClient.name,
+				Type: MessageTypeJoin,
+			}
+			msgOldClient := &message{
+				Name: clientToSend.name,
+				Type: MessageTypeJoin,
+			}
+			clientToSend.send <-msgNewClient
+			joinClient.send <-msgOldClient
+		}
+		log.Println(joinClient.name, "joined")
+	}
+	clients[joinClient] = true
 }
 
 const (

@@ -6,7 +6,6 @@ COPY run.sh /app/chat.sh
 RUN chmod +x /app/chat.sh
 COPY components /app/components
 COPY bower_components /app/bower_components
-COPY templates /app/templates
 COPY chat /app/chat
 RUN chmod +x /app/chat
 
