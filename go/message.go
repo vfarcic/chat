@@ -1,6 +1,6 @@
 package main
 
-type message struct {
+type Message struct {
 	Name string
 	Message string
 	Date string

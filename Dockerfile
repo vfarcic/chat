@@ -1,5 +1,8 @@
 FROM debian:jessie
 
+RUN apt-get update && \
+    apt-get install -y mongodb
+
 RUN mkdir -p /etc/ssl/certs /app
 
 COPY run.sh /app/chat.sh

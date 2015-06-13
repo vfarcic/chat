@@ -33,7 +33,7 @@ func TestJoinAddsClientToTheList(t *testing.T) {
 func getTestClient(name string) *client {
 	return &client{
 		socket: nil,
-		send: make(chan *message),
+		send: make(chan *Message),
 		room: nil,
 		name: "Viktor Farcic",
 		avatarlURL: "http://example.com/avatar",

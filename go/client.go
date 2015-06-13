@@ -7,7 +7,7 @@ import (
 
 type client struct {
 	socket *websocket.Conn
-	send chan *message
+	send chan *Message
 	room *room
 	name string
 	avatarlURL string
@@ -15,7 +15,7 @@ type client struct {
 
 func (c *client) read() {
 	for {
-		var msg *message
+		var msg *Message
 		if err := c.socket.ReadJSON(&msg); err == nil {
 			msg.Date = time.Now().Format("Monday, 02-Jan-06")
 			msg.Time = time.Now().Format("15:04")

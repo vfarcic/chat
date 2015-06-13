@@ -7,7 +7,7 @@ import (
 )
 
 type room struct {
-	forward chan *message
+	forward chan *Message
 	join chan *client
 	leave chan *client
 	clients map[*client]bool
@@ -15,7 +15,7 @@ type room struct {
 
 func newRoom() *room {
 	return &room {
-		forward: make(chan *message),
+		forward: make(chan *Message),
 		join: make(chan *client),
 		leave: make(chan *client),
 		clients: make(map[*client]bool),
@@ -30,7 +30,7 @@ func (r *room) Run() {
 		case client := <-r.leave:
 			if r.clients[client] {
 				for clientToSend := range r.clients {
-					msg := &message{
+					msg := &Message{
 						Name: client.name,
 						Type: MessageTypeLeave,
 					}
@@ -59,11 +59,11 @@ func (r *room) Run() {
 func joinRoom(joinClient *client, clients map[*client]bool) {
 	if !clients[joinClient] {
 		for clientToSend := range clients {
-			msgNewClient := &message{
+			msgNewClient := &Message{
 				Name: joinClient.name,
 				Type: MessageTypeJoin,
 			}
-			msgOldClient := &message{
+			msgOldClient := &Message{
 				Name: clientToSend.name,
 				Type: MessageTypeJoin,
 			}
@@ -103,7 +103,7 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	client := &client {
 		socket: socket,
-		send: make(chan *message, messageBufferSize),
+		send: make(chan *Message, messageBufferSize),
 		room: r,
 		name: authName,
 		avatarlURL: authAvatarURL,
