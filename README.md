@@ -37,6 +37,8 @@ sudo docker run -d --name chat \
 	vfarcic/chat
 ```
 
+After run, wait until MongoDB is initialized.
+
 Embed "Chat" Web Components
 ===========================
 
@@ -44,20 +46,21 @@ Embed "Chat" Web Components
 <html>
 <head>
 	<!--Import Required Polymer Components-->
-    <link rel="import" href="../bower_components/paper-styles/classes/global.html">
-    <link rel="import" href="../bower_components/polymer/polymer.html">
-    <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
-    <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-    <link rel="import" href="../bower_components/paper-button/paper-button.html">
-    <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
-    <link rel="import" href="../bower_components/paper-input/paper-textarea.html">
-    <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
-    <link rel="import" href="../bower_components/paper-material/paper-material.html">
-    <link rel="import" href="../components/chat/submit-chat.html">
-    <link rel="import" href="../components/chat/display-chat.html">
+	<script src="/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="/bower_components/paper-styles/classes/global.html">
+    <link rel="import" href="/bower_components/polymer/polymer.html">
+    <link rel="import" href="/bower_components/iron-icon/iron-icon.html">
+    <link rel="import" href="/bower_components/iron-icons/iron-icons.html">
+    <link rel="import" href="/bower_components/paper-button/paper-button.html">
+    <link rel="import" href="/bower_components/paper-fab/paper-fab.html">
+    <link rel="import" href="/bower_components/paper-input/paper-textarea.html">
+    <link rel="import" href="/bower_components/paper-toast/paper-toast.html">
+    <link rel="import" href="/bower_components/paper-material/paper-material.html">
+    <link rel="import" href="/components/chat/submit-chat.html">
+    <link rel="import" href="/components/chat/display-chat.html">
     <!--Import "Chat" Components-->
-	<link rel="import" href="http://localhost:8080/components/chat/submit-chat.html">
-	<link rel="import" href="http://localhost:8080/components/chat/display-chat.html">
+	<link rel="import" href="/components/chat/submit-chat.html">
+	<link rel="import" href="/components/chat/display-chat.html">
 </head>
 <body>
 	<!--Display "Chat" Components-->

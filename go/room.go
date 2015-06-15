@@ -52,6 +52,7 @@ func (r *Room) joinRoom(joinClient *Client) {
 		log.Println(joinClient.name, "joined")
 	}
 	r.clients[joinClient] = true
+	// TODO: Send all message from history
 //	messages := db
 //	clientToSend.send <- msg
 }

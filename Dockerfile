@@ -3,7 +3,7 @@ FROM debian:jessie
 RUN apt-get update && \
     apt-get install -y mongodb
 
-RUN mkdir -p /etc/ssl/certs /app
+RUN mkdir -p /data/db /etc/ssl/certs /app
 
 COPY run.sh /app/chat.sh
 RUN chmod +x /app/chat.sh
